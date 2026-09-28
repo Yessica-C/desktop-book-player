@@ -6,6 +6,8 @@ Desktop Graphical audiobook player app for Windows & Linux
 - Python backend service
 
 ## Run locally
+Requires Node.js 24 or newer.
+
 1. Install dependencies:
    ```bash
    npm install
