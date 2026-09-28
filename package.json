@@ -1,0 +1,20 @@
+{
+  "name": "desktop-book-player",
+  "version": "1.0.0",
+  "description": "Desktop Graphical audiobook player app for Windows & Linux",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "backend:start": "python3 backend/server.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://localhost:26831/Yessica-C/desktop-book-player"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^44.4.5"
+  }
+}
