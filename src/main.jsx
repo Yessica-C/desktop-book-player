@@ -249,7 +249,7 @@ function HomePage() {
     <>
       <main className="file-picker-page">
         <label className="file-picker">
-          {selectedFile ? selectedFile.name : 'Select audio file'}
+          Import
           <input type="file" accept="audio/*,.m4b" onChange={handleAudioSelection} />
         </label>
         <section className="audiobook-list" aria-labelledby="audiobook-list-heading">

@@ -6,10 +6,13 @@ const BACKEND_PORT = 8765;
 let backendProcess;
 
 function startBackend() {
-  const pythonCommand = process.env.PYTHON_PATH || (process.platform === 'win32' ? 'python' : 'python3');
+  const isWindows = process.platform === 'win32';
+  const configuredPython = process.env.PYTHON_PATH;
+  const pythonCommand = configuredPython || (isWindows ? 'py' : 'python3');
+  const pythonArgs = configuredPython ? [] : (isWindows ? ['-3'] : []);
   const backendPath = path.join(__dirname, 'backend', 'server.py');
 
-  backendProcess = spawn(pythonCommand, [backendPath], {
+  backendProcess = spawn(pythonCommand, [...pythonArgs, backendPath], {
     env: {
       ...process.env,
       BOOK_PLAYER_PORT: String(BACKEND_PORT),
@@ -18,6 +21,19 @@ function startBackend() {
   });
 
   backendProcess.on('error', (error) => {
+    // Some Ubuntu installations expose Python as `python` rather than
+    // `python3`; retry with that command when no explicit path was supplied.
+    if (!configuredPython && !isWindows && pythonCommand === 'python3') {
+      backendProcess = spawn('python', [backendPath], {
+        env: {
+          ...process.env,
+          BOOK_PLAYER_PORT: String(BACKEND_PORT),
+        },
+        stdio: 'inherit',
+      });
+      return;
+    }
+
     console.error('Failed to start Python backend:', error);
   });
 }
