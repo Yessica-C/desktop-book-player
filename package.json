@@ -7,6 +7,7 @@
     "build": "vite build",
     "start": "npm run build && electron .",
     "dist:linux": "npm run build && electron-builder --linux AppImage",
+    "dist:win": "npm run build && electron-builder --win nsis",
     "backend:start": "python3 backend/server.py"
   },
   "repository": {
@@ -36,6 +37,9 @@
     "linux": {
       "target": ["AppImage"],
       "category": "AudioVideo"
+    },
+    "win": {
+      "target": ["nsis"]
     }
   },
   "dependencies": {
