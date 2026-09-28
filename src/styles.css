@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap');
+
+:root {
+  color: #2d2926;
+  background: #f4efe7;
+  font-family: 'DM Sans', sans-serif;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+}
+
+.home-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+  gap: 2rem;
+  min-height: 100vh;
+  padding: clamp(2rem, 7vw, 6rem);
+  background: radial-gradient(circle at 10% 10%, #f9e3bf 0, transparent 32%), #f4efe7;
+}
+
+.welcome-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 700px;
+}
+
+.eyebrow,
+.card-label {
+  margin: 0 0 1rem;
+  color: #a05236;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  line-height: 1.05;
+}
+
+h1 {
+  max-width: 680px;
+  margin-bottom: 1.5rem;
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  letter-spacing: 0;
+}
+
+.intro {
+  max-width: 470px;
+  margin-bottom: 2rem;
+  color: #625952;
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
+
+.primary-button {
+  align-self: flex-start;
+  border: 0;
+  border-radius: 4px;
+  padding: 0.9rem 1.25rem;
+  color: #fffaf2;
+  background: #a05236;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.primary-button:hover {
+  background: #783c2c;
+  transform: translateY(-2px);
+}
+
+.status {
+  margin: 1.5rem 0 0;
+  color: #776d64;
+  font-size: 0.85rem;
+}
+
+.listening-card {
+  align-self: center;
+  border-top: 4px solid #a05236;
+  padding: 2rem;
+  background: #fffaf2;
+  box-shadow: 12px 12px 0 #dfc7a9;
+}
+
+.book-mark {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 3rem;
+  place-items: center;
+  border-radius: 50%;
+  color: #fffaf2;
+  background: #315c54;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.5rem;
+}
+
+.listening-card h2 {
+  margin-bottom: 0.8rem;
+  font-size: 2rem;
+}
+
+.listening-card p:last-child {
+  margin-bottom: 0;
+  color: #776d64;
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .home-page {
+    grid-template-columns: 1fr;
+  }
+
+  .listening-card {
+    width: 100%;
+  }
+}
