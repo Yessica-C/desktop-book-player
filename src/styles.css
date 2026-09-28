@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 
 :root {
   color: #2d2926;
@@ -21,120 +21,244 @@ button {
   font: inherit;
 }
 
-.home-page {
+.file-picker-page {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+  align-content: center;
   gap: 2rem;
   min-height: 100vh;
-  padding: clamp(2rem, 7vw, 6rem);
-  background: radial-gradient(circle at 10% 10%, #f9e3bf 0, transparent 32%), #f4efe7;
+  padding: 1.5rem;
+  place-items: center;
+  background: radial-gradient(circle at 50% 0%, #f9e3bf 0, transparent 42%), #f4efe7;
 }
 
-.welcome-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-width: 700px;
+.audiobook-list {
+  width: min(100%, 28rem);
+  padding: 1.25rem;
+  border: 1px solid #d7c4ad;
+  border-radius: 8px;
+  background: rgb(255 250 242 / 75%);
 }
 
-.eyebrow,
-.card-label {
-  margin: 0 0 1rem;
-  color: #a05236;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+.audiobook-list h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
 }
 
-h1,
-h2,
-p {
-  margin-top: 0;
-}
-
-h1,
-h2 {
-  font-family: 'Playfair Display', Georgia, serif;
-  line-height: 1.05;
-}
-
-h1 {
-  max-width: 680px;
-  margin-bottom: 1.5rem;
-  font-size: clamp(3rem, 7vw, 6.5rem);
-  letter-spacing: 0;
-}
-
-.intro {
-  max-width: 470px;
-  margin-bottom: 2rem;
-  color: #625952;
-  font-size: 1.15rem;
-  line-height: 1.6;
-}
-
-.primary-button {
-  align-self: flex-start;
-  border: 0;
-  border-radius: 4px;
-  padding: 0.9rem 1.25rem;
-  color: #fffaf2;
-  background: #a05236;
-  cursor: pointer;
-  font-weight: 700;
-  transition: background 160ms ease, transform 160ms ease;
-}
-
-.primary-button:hover {
-  background: #783c2c;
-  transform: translateY(-2px);
-}
-
-.status {
-  margin: 1.5rem 0 0;
-  color: #776d64;
+.audiobook-list p {
+  margin: 0;
+  color: #6d6259;
   font-size: 0.85rem;
 }
 
-.listening-card {
-  align-self: center;
-  border-top: 4px solid #a05236;
-  padding: 2rem;
-  background: #fffaf2;
-  box-shadow: 12px 12px 0 #dfc7a9;
+.audiobook-list ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.book-mark {
+.audiobook-list li {
+  border-left: 3px solid #a05236;
+  background: #f9e3bf;
+}
+
+.audiobook-list button {
+  width: 100%;
+  border: 0;
+  padding: 0.7rem 0.8rem;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.audiobook-list button:hover,
+.audiobook-list button:focus-visible {
+  background: #f0d39f;
+  outline: none;
+}
+
+.file-picker {
+  display: inline-flex;
+  max-width: min(100%, 28rem);
+  min-height: 2.7rem;
+  align-items: center;
+  border: 1px solid #a05236;
+  border-radius: 4px;
+  padding: 0.7rem 1rem;
+  color: #fffaf2;
+  background: #a05236;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-picker:hover {
+  background: #85452f;
+}
+
+.file-picker input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.audio-source {
+  display: none;
+}
+
+.audio-control-bar {
+  position: fixed;
+  z-index: 10;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  left: 1.25rem;
   display: grid;
-  width: 3rem;
-  height: 3rem;
-  margin-bottom: 3rem;
-  place-items: center;
-  border-radius: 50%;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(220px, 1.5fr) minmax(120px, 0.6fr);
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 84px;
+  padding: 1rem 1.25rem;
+  border: 1px solid #d7c4ad;
+  border-radius: 8px;
   color: #fffaf2;
   background: #315c54;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.5rem;
+  box-shadow: 0 16px 36px rgb(45 41 38 / 18%);
 }
 
-.listening-card h2 {
-  margin-bottom: 0.8rem;
-  font-size: 2rem;
+.track-summary,
+.transport-controls,
+.progress-control,
+.volume-control {
+  display: flex;
+  align-items: center;
 }
 
-.listening-card p:last-child {
-  margin-bottom: 0;
-  color: #776d64;
-  line-height: 1.6;
+.track-summary {
+  min-width: 0;
+  gap: 0.75rem;
+}
+
+.track-summary > div {
+  min-width: 0;
+}
+
+.track-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  color: #315c54;
+  background: #f9e3bf;
+  font-size: 1.3rem;
+}
+
+.track-kicker {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #c9d9c5;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.track-summary strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+.transport-controls {
+  gap: 0.6rem;
+}
+
+.audio-control-bar button {
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.audio-control-bar button:disabled,
+.audio-control-bar input:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.icon-button {
+  padding: 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.play-button {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 50% !important;
+  color: #315c54 !important;
+  background: #f9e3bf !important;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.progress-control {
+  gap: 0.7rem;
+  color: #dce6d7;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-control input {
+  flex: 1;
+}
+
+.volume-control {
+  gap: 0.7rem;
+  color: #dce6d7;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.volume-control input {
+  width: 100%;
+}
+
+input[type='range'] {
+  height: 1rem;
+  accent-color: #f9e3bf;
+  cursor: pointer;
 }
 
 @media (max-width: 720px) {
-  .home-page {
-    grid-template-columns: 1fr;
+  .audio-control-bar {
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem 1rem;
+    padding: 0.85rem 1rem;
   }
 
-  .listening-card {
-    width: 100%;
+  .progress-control {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .volume-control {
+    display: none;
   }
 }

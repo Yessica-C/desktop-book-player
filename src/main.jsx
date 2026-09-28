@@ -2,46 +2,289 @@ import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
-function HomePage() {
-  const [backendStatus, setBackendStatus] = useState('Checking connection...');
+function AudioControlBar() {
+  const [activeAudio, setActiveAudio] = useState(null);
+  const [audioState, setAudioState] = useState({
+    currentTime: 0,
+    duration: 0,
+    isPlaying: false,
+    volume: 1,
+  });
 
   useEffect(() => {
-    async function checkBackendHealth() {
-      try {
-        const response = await fetch(`${window.bookPlayer.backendUrl}/health`);
+    const audioListeners = new Map();
 
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
+    function refreshAudioElements() {
+      const audioElements = [...document.querySelectorAll('audio')];
+
+      audioElements.forEach((audio) => {
+        if (audioListeners.has(audio)) {
+          return;
         }
 
-        const payload = await response.json();
-        setBackendStatus(`Backend ${payload.status}`);
-      } catch (error) {
-        setBackendStatus(`Backend unavailable: ${error.message}`);
-      }
+        const handlePlay = () => setActiveAudio(audio);
+        const handleChange = () => {
+          setAudioState({
+            currentTime: audio.currentTime,
+            duration: Number.isFinite(audio.duration) ? audio.duration : 0,
+            isPlaying: !audio.paused,
+            volume: audio.volume,
+          });
+        };
+
+        audio.addEventListener('play', handlePlay);
+        ['pause', 'ended', 'loadedmetadata', 'timeupdate', 'volumechange'].forEach((eventName) => {
+          audio.addEventListener(eventName, handleChange);
+        });
+        audioListeners.set(audio, { handleChange, handlePlay });
+
+        if (!activeAudio || !activeAudio.isConnected) {
+          setActiveAudio(audio);
+        }
+      });
+
+      audioListeners.forEach((listeners, audio) => {
+        if (audio.isConnected) {
+          return;
+        }
+
+        audio.removeEventListener('play', listeners.handlePlay);
+        ['pause', 'ended', 'loadedmetadata', 'timeupdate', 'volumechange'].forEach((eventName) => {
+          audio.removeEventListener(eventName, listeners.handleChange);
+        });
+        audioListeners.delete(audio);
+      });
     }
 
-    void checkBackendHealth();
-  }, []);
+    refreshAudioElements();
+    const observer = new MutationObserver(refreshAudioElements);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      audioListeners.forEach((listeners, audio) => {
+        audio.removeEventListener('play', listeners.handlePlay);
+        ['pause', 'ended', 'loadedmetadata', 'timeupdate', 'volumechange'].forEach((eventName) => {
+          audio.removeEventListener(eventName, listeners.handleChange);
+        });
+      });
+    };
+  }, [activeAudio]);
+
+  useEffect(() => {
+    if (!activeAudio) {
+      return undefined;
+    }
+
+    const syncState = () => {
+      setAudioState({
+        currentTime: activeAudio.currentTime,
+        duration: Number.isFinite(activeAudio.duration) ? activeAudio.duration : 0,
+        isPlaying: !activeAudio.paused,
+        volume: activeAudio.volume,
+      });
+    };
+
+    syncState();
+    return () => activeAudio.removeEventListener('timeupdate', syncState);
+  }, [activeAudio]);
+
+  function togglePlayback() {
+    if (!activeAudio) {
+      return;
+    }
+
+    if (activeAudio.paused) {
+      void activeAudio.play();
+    } else {
+      activeAudio.pause();
+    }
+  }
+
+  function skip(seconds) {
+    if (activeAudio) {
+      activeAudio.currentTime = Math.max(0, Math.min(activeAudio.duration || 0, activeAudio.currentTime + seconds));
+    }
+  }
+
+  function formatTime(seconds) {
+    if (!Number.isFinite(seconds)) {
+      return '0:00';
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${remainingSeconds}`;
+  }
+
+  const title = activeAudio?.dataset.title || activeAudio?.getAttribute('aria-label') || 'Nothing playing';
+  const progress = audioState.duration ? (audioState.currentTime / audioState.duration) * 100 : 0;
 
   return (
-    <main className="home-page">
-      <section className="welcome-panel">
-        <p className="eyebrow">Your personal listening room</p>
-        <h1>Welcome to Desktop Book Player</h1>
-        <p className="intro">
-          Pick up where you left off and settle into your next great story.
-        </p>
-        <button type="button" className="primary-button">Browse your library</button>
-        <p className="status" aria-live="polite">{backendStatus}</p>
-      </section>
-      <aside className="listening-card">
-        <span className="book-mark" aria-hidden="true">A</span>
-        <p className="card-label">Ready when you are</p>
-        <h2>Your library is waiting.</h2>
-        <p>Add an audiobook to begin building your listening queue.</p>
-      </aside>
-    </main>
+    <nav className="audio-control-bar" aria-label="Audio playback controls">
+      <div className="track-summary">
+        <span className="track-icon" aria-hidden="true">♪</span>
+        <div>
+          <span className="track-kicker">Now listening</span>
+          <strong>{title}</strong>
+        </div>
+      </div>
+      <div className="transport-controls">
+        <button type="button" className="icon-button" onClick={() => skip(-15)} disabled={!activeAudio} aria-label="Skip back 15 seconds">-15</button>
+        <button type="button" className="play-button" onClick={togglePlayback} disabled={!activeAudio} aria-label={audioState.isPlaying ? 'Pause' : 'Play'}>
+          {audioState.isPlaying ? '||' : '>'}
+        </button>
+        <button type="button" className="icon-button" onClick={() => skip(30)} disabled={!activeAudio} aria-label="Skip forward 30 seconds">+30</button>
+      </div>
+      <div className="progress-control">
+        <span>{formatTime(audioState.currentTime)}</span>
+        <input
+          type="range"
+          min="0"
+          max={audioState.duration || 0}
+          step="0.1"
+          value={audioState.currentTime}
+          onChange={(event) => {
+            if (activeAudio) {
+              activeAudio.currentTime = Number(event.target.value);
+            }
+          }}
+          style={{ '--progress': `${progress}%` }}
+          disabled={!activeAudio || !audioState.duration}
+          aria-label="Playback progress"
+        />
+        <span>{formatTime(audioState.duration)}</span>
+      </div>
+      <label className="volume-control">
+        <span aria-hidden="true">VOL</span>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          value={audioState.volume}
+          onChange={(event) => {
+            if (activeAudio) {
+              activeAudio.volume = Number(event.target.value);
+            }
+          }}
+          disabled={!activeAudio}
+          aria-label="Volume"
+        />
+      </label>
+    </nav>
+  );
+}
+
+function HomePage() {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [audioUrl, setAudioUrl] = useState('');
+  const [selectedAudiobook, setSelectedAudiobook] = useState(null);
+  const [audiobooks, setAudiobooks] = useState([]);
+  const backendUrl = window.bookPlayer?.backendUrl || 'http://127.0.0.1:8765';
+
+  async function refreshAudiobooks() {
+    const response = await fetch(`${backendUrl}/audiobooks`);
+
+    if (!response.ok) {
+      throw new Error(`Audiobook list failed with status ${response.status}`);
+    }
+
+    const payload = await response.json();
+    setAudiobooks(payload.audiobooks);
+  }
+
+  useEffect(() => {
+    void refreshAudiobooks().catch((error) => {
+      console.error('Could not load audiobooks:', error);
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (audioUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(audioUrl);
+      }
+    };
+  }, [audioUrl]);
+
+  function playAudiobook(audiobook) {
+    setSelectedAudiobook(audiobook);
+    setSelectedFile({ name: audiobook.title });
+    setAudioUrl(`${backendUrl}/audio?filename=${encodeURIComponent(audiobook.filename)}`);
+  }
+
+  function handleAudioSelection(event) {
+    const [file] = event.target.files;
+
+    if (!file) {
+      return;
+    }
+
+    setSelectedFile(file);
+    setSelectedAudiobook(null);
+    setAudioUrl(URL.createObjectURL(file));
+    void fetch(`${backendUrl}/audiobooks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: file.path || file.name,
+        title: file.name,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Audiobook registration failed with status ${response.status}`);
+        }
+
+        return refreshAudiobooks();
+      })
+      .catch((error) => {
+        console.error('Could not register audiobook:', error);
+      });
+    event.target.value = '';
+  }
+
+  return (
+    <>
+      <main className="file-picker-page">
+        <label className="file-picker">
+          {selectedFile ? selectedFile.name : 'Select audio file'}
+          <input type="file" accept="audio/*,.m4b" onChange={handleAudioSelection} />
+        </label>
+        <section className="audiobook-list" aria-labelledby="audiobook-list-heading">
+          <h1 id="audiobook-list-heading">Your audiobooks</h1>
+          {audiobooks.length === 0 ? (
+            <p>No audiobooks yet.</p>
+          ) : (
+            <ul>
+              {audiobooks.map((audiobook) => (
+                <li key={audiobook.filename}>
+                  <button type="button" onClick={() => playAudiobook(audiobook)}>
+                    {audiobook.title}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </main>
+      {audioUrl && (
+        <audio
+          className="audio-source"
+          src={audioUrl}
+          data-title={selectedFile.name}
+          aria-label={selectedFile.name}
+          onLoadedMetadata={(event) => {
+            if (selectedAudiobook) {
+              event.currentTarget.currentTime = selectedAudiobook.current_time;
+            }
+          }}
+          controls={false}
+        />
+      )}
+      <AudioControlBar />
+    </>
   );
 }
 
