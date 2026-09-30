@@ -223,7 +223,7 @@ function HomePage() {
     setSelectedFile({ name: audiobook.title });
     setAudioUrl(`${backendUrl}/audio?filename=${encodeURIComponent(audiobook.filename)}`);
     console.log(`Audio URL set to: ${backendUrl}/audio?filename=${encodeURIComponent(audiobook.filename)}`);
-    }
+  }
 
   function handleAudioSelection(event) {
     const [file] = event.target.files;

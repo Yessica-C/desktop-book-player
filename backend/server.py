@@ -53,13 +53,50 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": "audio file not found"}, status=404)
             return
 
-        body = audio_path.read_bytes()
-        self.send_response(200)
+        file_size = audio_path.stat().st_size
+        range_header = self.headers.get("Range")
+        start = 0
+        end = file_size - 1
+
+        if range_header:
+            try:
+                range_value = range_header.removeprefix("bytes=").split(",", 1)[0]
+                range_start, range_end = range_value.split("-", 1)
+                if range_start:
+                    start = int(range_start)
+                    if range_end:
+                        end = int(range_end)
+                else:
+                    suffix_length = int(range_end)
+                    start = max(file_size - suffix_length, 0)
+
+                if start < 0 or start >= file_size or end < start:
+                    raise ValueError
+                end = min(end, file_size - 1)
+            except (TypeError, ValueError):
+                self.send_response(416)
+                self.send_header("Content-Range", f"bytes */{file_size}")
+                self.end_headers()
+                return
+
+        content_length = end - start + 1
+        self.send_response(206 if range_header else 200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Content-Type", mimetypes.guess_type(audio_path.name)[0] or "application/octet-stream")
-        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Content-Length", str(content_length))
+        if range_header:
+            self.send_header("Content-Range", f"bytes {start}-{end}/{file_size}")
         self.end_headers()
-        self.wfile.write(body)
+        with audio_path.open("rb") as audio_file:
+            audio_file.seek(start)
+            remaining = content_length
+            while remaining:
+                chunk = audio_file.read(min(64 * 1024, remaining))
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                remaining -= len(chunk)
 
     def do_POST(self):
         if urlparse(self.path).path != "/audiobooks":
