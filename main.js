@@ -2,39 +2,47 @@ const { app, BrowserWindow } = require('electron');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
-const BACKEND_PORT = 8765;
 let backendProcess;
 
 function startBackend() {
   const isWindows = process.platform === 'win32';
   const configuredPython = process.env.PYTHON_PATH;
   const pythonCommand = configuredPython || (isWindows ? 'py' : 'python3');
-  const pythonArgs = configuredPython ? [] : (isWindows ? ['-3'] : []);
+  const pythonArgs = configuredPython ? ['-u'] : (isWindows ? ['-3', '-u'] : ['-u']);
   const backendPath = path.join(__dirname, 'backend', 'server.py');
 
-  backendProcess = spawn(pythonCommand, [...pythonArgs, backendPath], {
-    env: {
-      ...process.env,
-      BOOK_PLAYER_PORT: String(BACKEND_PORT),
-    },
-    stdio: 'inherit',
-  });
-
-  backendProcess.on('error', (error) => {
-    // Some Ubuntu installations expose Python as `python` rather than
-    // `python3`; retry with that command when no explicit path was supplied.
-    if (!configuredPython && !isWindows && pythonCommand === 'python3') {
-      backendProcess = spawn('python', [backendPath], {
+  return new Promise((resolve, reject) => {
+    const launch = (command, args, canRetry) => {
+      const child = spawn(command, [...args, backendPath], {
         env: {
           ...process.env,
-          BOOK_PLAYER_PORT: String(BACKEND_PORT),
+          BOOK_PLAYER_PORT: '0',
         },
-        stdio: 'inherit',
+        stdio: ['ignore', 'pipe', 'inherit'],
       });
-      return;
-    }
+      backendProcess = child;
 
-    console.error('Failed to start Python backend:', error);
+      let output = '';
+      child.stdout.on('data', (chunk) => {
+        output += chunk.toString();
+        const portMatch = output.match(/Python backend listening on port (\d+)/);
+        if (portMatch) {
+          process.env.BACKEND_PORT = portMatch[1];
+          resolve(Number(portMatch[1]));
+        }
+      });
+
+      child.on('error', (error) => {
+        if (canRetry) {
+          launch('python', ['-u'], false);
+          return;
+        }
+
+        reject(error);
+      });
+    };
+
+    launch(pythonCommand, pythonArgs, !configuredPython && !isWindows && pythonCommand === 'python3');
   });
 }
 
@@ -52,8 +60,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  startBackend();
-  createWindow();
+  startBackend()
+    .then(() => createWindow())
+    .catch((error) => console.error('Failed to start Python backend:', error));
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

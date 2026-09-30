@@ -190,7 +190,7 @@ function HomePage() {
   const [audioUrl, setAudioUrl] = useState('');
   const [selectedAudiobook, setSelectedAudiobook] = useState(null);
   const [audiobooks, setAudiobooks] = useState([]);
-  const backendUrl = window.bookPlayer?.backendUrl || 'http://127.0.0.1:8765';
+  const backendUrl = window.bookPlayer?.backendUrl;
 
   async function refreshAudiobooks() {
     const response = await fetch(`${backendUrl}/audiobooks`);

@@ -83,5 +83,5 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     server = HTTPServer(("127.0.0.1", PORT), Handler)
-    print(f"Python backend listening on port {PORT}")
+    print(f"Python backend listening on port {server.server_address[1]}", flush=True)
     server.serve_forever()
