@@ -30,6 +30,9 @@
     "appId": "com.yessicac.desktopbookplayer",
     "productName": "Desktop Book Player",
     "asar": true,
+    "asarUnpack": [
+      "backend/**/*"
+    ],
     "files": [
       "dist/**/*",
       "backend/**/*",

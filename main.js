@@ -9,7 +9,10 @@ function startBackend() {
   const configuredPython = process.env.PYTHON_PATH;
   const pythonCommand = configuredPython || (isWindows ? 'py' : 'python3');
   const pythonArgs = configuredPython ? ['-u'] : (isWindows ? ['-3', '-u'] : ['-u']);
-  const backendPath = path.join(__dirname, 'backend', 'server.py');
+  const backendRoot = app.isPackaged
+    ? path.join(process.resourcesPath, 'app.asar.unpacked', 'backend')
+    : path.join(__dirname, 'backend');
+  const backendPath = path.join(backendRoot, 'server.py');
 
   return new Promise((resolve, reject) => {
     const launch = (command, args, canRetry) => {
