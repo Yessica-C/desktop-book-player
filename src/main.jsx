@@ -112,9 +112,18 @@ function AudioControlBar() {
       return '0:00';
     }
 
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
-    return `${minutes}:${remainingSeconds}`;
+    const hours = Math.floor(seconds / 3600);   
+    if (hours > 0) {
+      const remainingMinutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${hours}:${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds}`;
+    }
+    else
+    {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${minutes}:${remainingSeconds}`;
+    }
   }
 
   const title = activeAudio?.dataset.title || activeAudio?.getAttribute('aria-label') || 'Nothing playing';
