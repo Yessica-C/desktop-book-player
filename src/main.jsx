@@ -218,10 +218,12 @@ function HomePage() {
   }, [audioUrl]);
 
   function playAudiobook(audiobook) {
+    console.log(`Playing audiobook: ${audiobook.title}`);
     setSelectedAudiobook(audiobook);
     setSelectedFile({ name: audiobook.title });
     setAudioUrl(`${backendUrl}/audio?filename=${encodeURIComponent(audiobook.filename)}`);
-  }
+    console.log(`Audio URL set to: ${backendUrl}/audio?filename=${encodeURIComponent(audiobook.filename)}`);
+    }
 
   function handleAudioSelection(event) {
     const [file] = event.target.files;
@@ -230,6 +232,7 @@ function HomePage() {
       return;
     }
 
+    const originalPath = window.bookPlayer?.getPathForFile?.(file) || file.path || file.name;
     setSelectedFile(file);
     setSelectedAudiobook(null);
     setAudioUrl(URL.createObjectURL(file));
@@ -237,7 +240,7 @@ function HomePage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        filename: file.path || file.name,
+        filename: originalPath,
         title: file.name,
       }),
     })

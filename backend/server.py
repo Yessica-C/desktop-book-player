@@ -35,12 +35,14 @@ class Handler(BaseHTTPRequestHandler):
 
         if parsed_path.path == "/audio":
             self.send_audio(parse_qs(parsed_path.query).get("filename", [""])[0])
+            print(f"Request for audio file: {parse_qs(parsed_path.query).get('filename', [''])[0]}")
             return
 
         self.send_response(404)
         self.end_headers()
 
     def send_audio(self, filename: str) -> None:
+        print(f"send_audio of file: {filename}")
         audiobook = library.get(filename)
         if audiobook is None:
             self.send_json({"error": "audiobook not found"}, status=404)
