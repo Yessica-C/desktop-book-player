@@ -1,0 +1,59 @@
+{
+  "name": "desktop-book-player",
+  "version": "1.0.1",
+  "description": "Desktop Graphical audiobook player app for Windows & Linux",
+  "main": "main.js",
+  "scripts": {
+    "build": "vite build",
+    "start": "npm run build && electron .",
+    "dist:linux": "npm run build && electron-builder --linux AppImage",
+    "dist:win": "npm run build && electron-builder --win nsis",
+    "backend:start": "python3 backend/server.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://localhost:26831/Yessica-C/desktop-book-player"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "electron": "^44.4.5",
+    "electron-builder": "^26.0.12",
+    "vite": "^8.3.1"
+  },
+  "build": {
+    "appId": "com.yessicac.desktopbookplayer",
+    "productName": "Desktop Book Player",
+    "asar": true,
+    "files": [
+      "dist/**/*",
+      "backend/**/*",
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "AudioVideo"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "allowScripts": {
+    "electron-winstaller@5.4.0": true
+  }
+}
