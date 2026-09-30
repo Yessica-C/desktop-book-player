@@ -1,6 +1,6 @@
 {
   "name": "desktop-book-player",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Desktop Graphical audiobook player app for Windows & Linux",
   "main": "main.js",
   "scripts": {

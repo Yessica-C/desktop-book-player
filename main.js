@@ -40,8 +40,8 @@ function startBackend() {
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 600,
+    width: 1600,
+    height: 900,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },

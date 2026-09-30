@@ -28,8 +28,10 @@ jobs:
       - name: Read app version
         id: app-version
         shell: bash
-        run: echo "version=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
-
+        run: |
+          version="$(node -p 'require("./package.json").version')"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
