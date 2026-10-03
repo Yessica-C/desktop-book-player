@@ -1,14 +1,13 @@
 {
   "name": "desktop-book-player",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Desktop Graphical audiobook player app for Windows & Linux",
   "main": "main.js",
   "scripts": {
     "build": "vite build",
     "start": "npm run build && electron .",
     "dist:linux": "npm run build && electron-builder --linux AppImage",
-    "dist:win": "npm run build && electron-builder --win nsis",
-    "backend:start": "python3 backend/server.py"
+    "dist:win": "npm run build && electron-builder --win nsis"
   },
   "repository": {
     "type": "git",
@@ -27,15 +26,11 @@
     "vite": "^8.3.1"
   },
   "build": {
-    "appId": "com.yessicac.desktopbookplayer",
+    "appId": "com.Yessica-c.desktopbookplayer",
     "productName": "Desktop Book Player",
     "asar": true,
-    "asarUnpack": [
-      "backend/**/*"
-    ],
     "files": [
       "dist/**/*",
-      "backend/**/*",
       "main.js",
       "preload.js",
       "package.json"
