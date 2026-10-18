@@ -57,3 +57,5 @@ patches/mtime-cache.json
 spec/fixtures/logo.png
 
 .yarn/install-state.gz
+docs/audio-control-bar-spec.md
+docs/parent-audio-player-spec.md
