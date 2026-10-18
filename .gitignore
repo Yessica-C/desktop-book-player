@@ -17,6 +17,7 @@
 *.xcodeproj
 /.idea/
 /dist/
+dist-electron/
 node_modules/
 SHASUMS256.txt
 **/package-lock.json
