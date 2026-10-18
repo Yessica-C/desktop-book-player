@@ -1,0 +1,15 @@
+{
+  "name": "desktop-book-player",
+  "version": "1.0.0",
+  "description": "Desktop Audiobook Library ",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yessica-C",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^44.9.0"
+  }
+}
